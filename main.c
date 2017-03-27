@@ -39,8 +39,6 @@
 #include "can.h"
 #include "CciConfig.h"
 
-
-
 can_t AliveMsg;
 char AliveCounter_u8 = 0;	
 
