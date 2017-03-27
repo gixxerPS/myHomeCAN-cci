@@ -9,6 +9,10 @@
 #ifndef INITECU_H_
 #define INITECU_H_
 
+#ifndef F_CPU
+#define F_CPU 16000000UL
+#endif
+
 void InitI0I(void);
 void InitTimer(void);
 void InitISR(void);
