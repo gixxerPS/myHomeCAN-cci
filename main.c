@@ -29,15 +29,16 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
-#define F_CPU 16000000UL
+//#define F_CPU 16000000UL
 
-#include <avr/io.h>
 #include "InitEcu.h"
+#include <util/delay.h>
+#include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include "can.h"
 #include "CciConfig.h"
-#include <util/delay.h>
+
 
 
 can_t AliveMsg;
