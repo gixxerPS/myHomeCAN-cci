@@ -38,17 +38,15 @@
 #include <avr/interrupt.h>
 #include "can.h"
 #include "CciConfig.h"
+#include "Identifier.h"
 
 can_t AliveMsg;
-char AliveCounter_u8 = 0;	
 
 
 ISR( TIMER1_OVF_vect ) 
 {
-   // Nachricht verschicken
-	AliveMsg.data[2] = (char)AliveCounter_u8;
-	can_send_message(&AliveMsg);
-	AliveCounter_u8 +=1;
+   // Alive inkrement
+	AliveMsg.data[3] +=1;
 }
 
 ISR(INT0_vect)
@@ -61,35 +59,49 @@ ISR(INT0_vect)
     PORTD |= (1<<PD7); // set LED ON
   }
   can_check_message();
-  can_get_message( &AliveMsg);
+ // can_get_message( &AliveMsg);
 }
 
 int main (void)
 {	  
 	/* Insert system clock initialization code here (sysclk_init()). */
+	Identifier_t AliveId_t;
+	uint8_t OldAliveCounter_u8 = 255;
+	
     InitI0I();
     InitTimer();
     InitISR();
 	_delay_ms(10);
-	GetNodeId();
+	GetUnitId();
 	GetFctId();
 	can_init(BITRATE_125_KBPS);
 	
-
-	AliveMsg.id = CCiConfig_t.FctId | (CCiConfig_t.NodeId_u8<<3);
-	AliveMsg.flags.rtr = 0;
-	AliveMsg.flags.extended = 0;
+	AliveId_t.Number_u8 = 0;
+	AliveId_t.SrcFct_u8 = CCiConfig_t.FctId;
+	AliveId_t.SrcId_u8 = CCiConfig_t.UnitId_u8;
+	AliveId_t.TargetFct_u8 = 0;
+	AliveId_t.TargetId_u8 = 0;
+	AliveId_t.Prio_u8 = 0;
 	
-	AliveMsg.length = 3;
-	AliveMsg.data[0] = CCiConfig_t.FctId;
-	AliveMsg.data[1] = CCiConfig_t.NodeId_u8;
-	AliveMsg.data[2] = (char)AliveCounter_u8;
+	AliveMsg.id = BuildIdentifier( AliveId_t);
+	AliveMsg.flags.rtr = 0;
+	AliveMsg.flags.extended = 1;
+	AliveMsg.length = 8;
+	AliveMsg.data[0] = VERSION_HIGH;
+	AliveMsg.data[1] = VERSION_MID;
+	AliveMsg.data[2] = VERSION_LOW;
 
 
 	
 	for(;;)
 	{
-		_delay_ms(500);
+	  if (OldAliveCounter_u8 != (uint8_t) AliveMsg.data[3]) // send new Alive message
+	  {
+		OldAliveCounter_u8 = AliveMsg.data[3];
+		can_send_message(&AliveMsg);		  
+	  }
+	  
+	  _delay_ms(50);
 	}
 	
 

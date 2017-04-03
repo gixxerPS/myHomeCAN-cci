@@ -19,4 +19,8 @@ void InitISR(void);
 
 #define ALL_PORTS_ON 0xff
 
+#define VERSION_LOW    0x1
+#define VERSION_MID    0x0
+#define VERSION_HIGH   0x0
+
 #endif /* INITECU_H_ */

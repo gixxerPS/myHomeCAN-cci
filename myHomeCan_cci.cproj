@@ -193,6 +193,12 @@
     <Compile Include="lib\can\config.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="lib\can\Identifier.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="lib\can\Identifier.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="lib\can\mcp2515.c">
       <SubType>compile</SubType>
     </Compile>

@@ -8,12 +8,12 @@
 #include "CciConfig.h"
 #include <avr/io.h>
 
-void GetNodeId(void)
+void GetUnitId(void)
 {
 	#define NODE_ID_BITS 0b11111000
 	
-	CCiConfig_t.NodeId_u8 = ~(PINA & NODE_ID_BITS);
-	CCiConfig_t.NodeId_u8 = CCiConfig_t.NodeId_u8 >> 3;
+	CCiConfig_t.UnitId_u8 = ~(PINA & NODE_ID_BITS);
+	CCiConfig_t.UnitId_u8 = CCiConfig_t.UnitId_u8 >> 3;
 			
 }
 	
@@ -23,15 +23,15 @@ void GetFctId(void)
 	
 	switch (PINA & FCT_ID_BITS)
 	{
-		case SensorUnit:
+		case SwitchSensorUnit:
 		CCiConfig_t.FctId = SensorUnit;
 		break;
 		
-		case PowerUnit:
+		case SwitchPowerUnit:
 		CCiConfig_t.FctId = PowerUnit;
 		break;
 		
-		case InterfaceUnit:
+		case SwitchInterfaceUnit:
 		CCiConfig_t.FctId = InterfaceUnit;
 		break;
 		

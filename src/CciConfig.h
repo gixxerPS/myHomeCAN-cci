@@ -14,17 +14,18 @@
 #include <avr/io.h>
 
 /*TYPEDEFS*/
-  typedef enum {Unknowm, SensorUnit = 6, PowerUnit = 5, InterfaceUnit = 3, NotConfigured = 255 }FunctionID;
+  typedef enum {Unknown,SensorUnit = 0b010, PowerUnit = 0b011, InterfaceUnit = 0b100, NotConfigured = 0b111 }FunctionID;
+  typedef enum {SwitchSensorUnit = 6, SwitchPowerUnit = 5, SwitchInterfaceUnit = 3, SwitchNotConfigured = 255 }DipSwitchFctID;
 	
   typedef struct Config{
     FunctionID FctId;
-    char NodeId_u8;
+    char UnitId_u8;
   }Config_t;
   
   Config_t CCiConfig_t;
 
 /*DECLARATIONS*/
-  void GetNodeId(void);
+  void GetUnitId(void);
   void GetFctId(void);
 
 #endif /* CCICONFIG_H_ */
