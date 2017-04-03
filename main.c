@@ -70,10 +70,10 @@ int main (void)
 	
     InitI0I();
     InitTimer();
-    InitISR();
+    InitISR(); //Timer and IO Interrupt
 	_delay_ms(10);
-	GetUnitId();
-	GetFctId();
+	GetUnitId(); //0 - 31
+	GetFctId(); //Sensor Unit, Power Unit, Interface Unit
 	can_init(BITRATE_125_KBPS);
 	
 	AliveId_t.Number_u8 = 0;
