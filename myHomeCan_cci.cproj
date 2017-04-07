@@ -115,7 +115,7 @@
       <Value>../lib</Value>
       <Value>../lib/can</Value>
       <Value>../src</Value>
-      <Value>../src/SensorUnit</Value>
+      <Value>../src/PowerUnit</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
@@ -141,7 +141,7 @@
     <Folder Include="lib" />
     <Folder Include="lib\can" />
     <Folder Include="src" />
-    <Folder Include="src\SensorUnit" />
+    <Folder Include="src\PowerUnit" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="lib\can\at90can.c">
@@ -297,10 +297,10 @@
     <Compile Include="src\InitEcu.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\SensorUnit\PowerUnit.c">
+    <Compile Include="src\PowerUnit\PowerUnit.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\SensorUnit\PowerUnit.h">
+    <Compile Include="src\PowerUnit\PowerUnit.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

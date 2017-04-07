@@ -10,7 +10,9 @@
 #define POWERUNIT_H_
 
 #include <avr/pgmspace.h>
+#include "InitEcu.h"
 
 
+void SetDigitalOutput( DigOut_t* Output_t );
 
 #endif /* POWERUNIT_H_ */

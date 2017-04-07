@@ -39,6 +39,7 @@
 #include "can.h"
 #include "CciConfig.h"
 #include "Identifier.h"
+#include "PowerUnit.h"
 
 can_t AliveMsg;
 
@@ -51,15 +52,17 @@ ISR( TIMER1_OVF_vect )
 
 ISR(INT0_vect)
 {
-  if (PORTD & ((char)1<<PD7)) {
-    PORTD &= ~((char)1<<PIND7); // set LED OFF
+  if (DigOutArray_t[0].State == 0)
+  {
+	DigOutArray_t[0].State = 1;
+	SetDigitalOutput( &DigOutArray_t[0] );
   }
   else
   {
-    PORTD |= (1<<PD7); // set LED ON
+	DigOutArray_t[0].State = 0;
+	SetDigitalOutput( &DigOutArray_t[0] );  
   }
   can_check_message();
- // can_get_message( &AliveMsg);
 }
 
 int main (void)
@@ -68,12 +71,12 @@ int main (void)
 	Identifier_t AliveId_t;
 	uint8_t OldAliveCounter_u8 = 255;
 	
-    InitI0I();
     InitTimer();
     InitISR(); //Timer and IO Interrupt
 	_delay_ms(10);
 	GetUnitId(); //0 - 31
 	GetFctId(); //Sensor Unit, Power Unit, Interface Unit
+	InitI0I();
 	can_init(BITRATE_125_KBPS);
 	
 	AliveId_t.Number_u8 = 0;
