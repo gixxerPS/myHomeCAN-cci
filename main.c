@@ -42,7 +42,9 @@
 #include "PowerUnit.h"
 
 can_t AliveMsg;
+can_t CommandReceiveMsg;
 
+volatile uint8_t test_u8 = 0;
 
 ISR( TIMER1_OVF_vect ) 
 {
@@ -50,19 +52,14 @@ ISR( TIMER1_OVF_vect )
 	AliveMsg.data[3] +=1;
 }
 
-ISR(INT0_vect)
+ISR(INT0_vect)  // CAN Interrupt
 {
-  if (DigOutArray_t[0].State == 0)
-  {
-	DigOutArray_t[0].State = 1;
-	SetDigitalOutput( &DigOutArray_t[0] );
-  }
-  else
-  {
-	DigOutArray_t[0].State = 0;
-	SetDigitalOutput( &DigOutArray_t[0] );  
-  }
-  can_check_message();
+
+
+
+
+    
+
 }
 
 int main (void)
@@ -71,26 +68,29 @@ int main (void)
 	Identifier_t AliveId_t;
 	uint8_t OldAliveCounter_u8 = 255;
 	
-    InitTimer();
-    InitISR(); //Timer and IO Interrupt
+  InitTimer();
+  InitISR();   // Timer and IO Interrupt
 	_delay_ms(10);
-	GetUnitId(); //0 - 31
-	GetFctId(); //Sensor Unit, Power Unit, Interface Unit
-	InitI0I();
+	GetUnitId(); // 0 - 31
+	GetFctId();  // Sensor Unit, Power Unit, Interface Unit
+	InitI0I();   // depends on via DIP configured function
 	can_init(BITRATE_125_KBPS);
 	
-	AliveId_t.Number_u8 = 0;
-	AliveId_t.SrcFct_u8 = CCiConfig_t.FctId;
-	AliveId_t.SrcId_u8 = CCiConfig_t.UnitId_u8;
-	AliveId_t.TargetFct_u8 = 0;
-	AliveId_t.TargetId_u8 = 0;
-	AliveId_t.Prio_u8 = 0;
+/* START: Build Identifier for Alive message*/
+	AliveId_t.Number_u8 = 0;  // Alive message is message number 0
+	AliveId_t.SrcFct_u8 = CCiConfig_t.FctId; //as configured via DIP
+	AliveId_t.SrcId_u8 = CCiConfig_t.UnitId_u8;  //as configured via DIP
+	AliveId_t.TargetFct_u8 = 0;  // Broadcast
+	AliveId_t.TargetId_u8 = 0;   // Broadcast
+	AliveId_t.Prio_u8 = 0;       // for future use
 	
 	AliveMsg.id = BuildIdentifier( AliveId_t);
+/* END: Build Identifier for Alive message*/
+
 	AliveMsg.flags.rtr = 0;
-	AliveMsg.flags.extended = 1;
-	AliveMsg.length = 8;
-	AliveMsg.data[0] = VERSION_HIGH;
+	AliveMsg.flags.extended = 1; //extendet ID
+	AliveMsg.length = 8;         //DLC
+	AliveMsg.data[0] = VERSION_HIGH;  //Software Version
 	AliveMsg.data[1] = VERSION_MID;
 	AliveMsg.data[2] = VERSION_LOW;
 
@@ -100,12 +100,29 @@ int main (void)
 	{
 	  if (OldAliveCounter_u8 != (uint8_t) AliveMsg.data[3]) // send new Alive message
 	  {
-		OldAliveCounter_u8 = AliveMsg.data[3];
-		can_send_message(&AliveMsg);		  
+		  OldAliveCounter_u8 = AliveMsg.data[3];
+		  can_send_message(&AliveMsg);		  
 	  }
-	  
-	  _delay_ms(50);
-	}
+
+
+    if ( can_get_message(&CommandReceiveMsg) )
+    {
+      test_u8 = can_get_message(&CommandReceiveMsg);
+      _delay_ms(10);
+
+      if (DigOutArray_t[0].State == 0)
+      {
+	    DigOutArray_t[0].State = 1;
+	    SetDigitalOutput( &DigOutArray_t[0] );
+      }
+      else
+      {
+	    DigOutArray_t[0].State = 0;
+	    SetDigitalOutput( &DigOutArray_t[0] );  
+      }
+   }
+  }
+
 	
 
 	/* Insert application code here, after the board has been initialized. */

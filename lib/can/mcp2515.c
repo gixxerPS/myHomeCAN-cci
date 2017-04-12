@@ -223,8 +223,8 @@ bool mcp2515_init(uint8_t bitrate)
 	
 	
 	// aktivieren/deaktivieren der Interrupts
-	spi_putc(MCP2515_INTERRUPTS);
-	//mcp2515_write_register(CANINTE, (1<<RX1IE)|(1<<RX0IE));
+	//spi_putc(MCP2515_INTERRUPTS);
+	mcp2515_write_register(CANINTE, (1<<RX1IE)|(1<<RX0IE));
 	
 	SET(MCP2515_CS);
 	// TXnRTS Bits als Inputs schalten
