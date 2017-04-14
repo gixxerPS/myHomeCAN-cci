@@ -15,7 +15,7 @@
 
 /*TYPEDEFS*/
   typedef enum {Unknown,Master = 0b001,SensorUnit = 0b010, PowerUnit = 0b011, InterfaceUnit = 0b100, NotConfigured = 0b111 }FunctionID;
-  typedef enum {SwitchSensorUnit = 6, SwitchPowerUnit = 5, SwitchInterfaceUnit = 3, SwitchNotConfigured = 255 }DipSwitchFctID;
+ // typedef enum {SwitchSensorUnit = 6, SwitchPowerUnit = 5, SwitchInterfaceUnit = 3, SwitchNotConfigured = 255 }DipSwitchFctID;
 	
   typedef struct Config{
     FunctionID FctId;

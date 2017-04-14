@@ -13,7 +13,5 @@
 #include "InitEcu.h"
 #include "can.h"
 
-
-void SetDigitalOutput( DigOut_t* Output_t );
 void SetPowerUnitOutputs(can_t *msg);
 #endif /* POWERUNIT_H_ */

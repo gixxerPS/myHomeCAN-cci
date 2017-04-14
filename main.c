@@ -40,6 +40,7 @@
 #include "CciConfig.h"
 #include "Identifier.h"
 #include "PowerUnit.h"
+#include "InterfaceUnit.h"
 
 can_t AliveMsg;
 can_t CommandReceiveMsg;
@@ -117,7 +118,11 @@ int main (void)
           case PowerUnit:
           SetPowerUnitOutputs(&CommandReceiveMsg);  // read output command and set outputs
           break;
-                 
+          
+          case InterfaceUnit:
+          SetInterfaceUnitOutputs(&CommandReceiveMsg); // read output command and set outputs 
+          break;      
+          
           default:
           break;
         }

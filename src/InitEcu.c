@@ -16,6 +16,7 @@ void InitI0I(void)
   switch (CCiConfig_t.FctId)
   {
     case PowerUnit:
+    case InterfaceUnit:
 	  //Outputs
 	  DigOutArray_t[0].Output = DO_01;
 	  DigOutArray_t[0].Number = PD7; 
@@ -77,6 +78,8 @@ void InitI0I(void)
 	  DigOutArray_t[11].Port = &PORTD;
 	  DigOutArray_t[11].DDReg = &DDRD;
 	  
+    /*--------------- Further outputs only for Power Unit --------*/
+    
 	  DigOutArray_t[12].Output = DO_13;
 	  DigOutArray_t[12].Number = PD7;
 	  DigOutArray_t[12].Port = &PORTD;
@@ -98,17 +101,25 @@ void InitI0I(void)
 	  DigOutArray_t[15].DDReg = &DDRD;
 	  
 	  //Init Outputs
+    if (CCiConfig_t.FctId == PowerUnit) //16 Outputs for Power Unit
+    { 
       for (uint8_t i = 0; i< DO_16; i++)
-	  {
-	    *DigOutArray_t[i].DDReg |= (1<<DigOutArray_t[i].Number);
-	  }
-	  
-      break;	
-	  
-	case InterfaceUnit:
-	  //Inputs
-
-      break;
+	    {
+	      *DigOutArray_t[i].DDReg |= (1<<DigOutArray_t[i].Number);
+	    }
+    }    
+    if (CCiConfig_t.FctId == PowerUnit) break;    // Further commands only for Interface unit
+    
+    
+    if (CCiConfig_t.FctId == InterfaceUnit)  //12 outputs for interface unit
+    { 
+      for (uint8_t i = 0; i< DO_12; i++)
+	    {
+	      *DigOutArray_t[i].DDReg |= (1<<DigOutArray_t[i].Number);
+	    }
+    }
+    
+    break; 
 	  
     default:
 	  break;	
@@ -117,7 +128,7 @@ void InitI0I(void)
 
 	  
   DDRD &= ~((char)1<<PIND2); // Interrupt PIn as Input
-  
+  /* DIP Switches */
   DDRA = 0; // ALL Inputs (DIP switches)
   PORTA = ALL_PORTS_ON; //All Pull UPs on  	
 }

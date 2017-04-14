@@ -21,17 +21,17 @@ void GetFctId(void)
 {
 	#define FCT_ID_BITS 0b00000111
 	
-	switch (PINA & FCT_ID_BITS)
+	switch (~PINA & FCT_ID_BITS)
 	{
-		case SwitchSensorUnit:
+		case SensorUnit:
 		CCiConfig_t.FctId = SensorUnit;
 		break;
 		
-		case SwitchPowerUnit:
+		case PowerUnit:
 		CCiConfig_t.FctId = PowerUnit;
 		break;
 		
-		case SwitchInterfaceUnit:
+		case InterfaceUnit:
 		CCiConfig_t.FctId = InterfaceUnit;
 		break;
 		

@@ -116,6 +116,7 @@
       <Value>../lib/can</Value>
       <Value>../src</Value>
       <Value>../src/PowerUnit</Value>
+      <Value>../src/InterfaceUnit</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
@@ -141,6 +142,7 @@
     <Folder Include="lib" />
     <Folder Include="lib\can" />
     <Folder Include="src" />
+    <Folder Include="src\InterfaceUnit" />
     <Folder Include="src\PowerUnit" />
   </ItemGroup>
   <ItemGroup>
@@ -295,6 +297,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\InitEcu.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\InterfaceUnit\InterfaceUnit.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\InterfaceUnit\InterfaceUnit.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\PowerUnit\PowerUnit.c">

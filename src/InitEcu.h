@@ -43,6 +43,19 @@ typedef enum {	DO_01 = 1,
 				        DO_14,
 				        DO_15,
 				        DO_16,}DigOutNr;
+                
+typedef enum {	DI_01 = 1,
+  DI_02,
+  DI_03,
+  DI_04,
+  DI_05,
+  DI_06,
+  DI_07,
+  DI_08,
+  DI_09,
+  DI_10,
+  DI_11,
+  DI_12,}DigInNr;
 				
 typedef struct DigOut{
 	DigOutNr Output;
@@ -52,6 +65,15 @@ typedef struct DigOut{
 	uint8_t  State;
 }DigOut_t;
 
-DigOut_t  DigOutArray_t[16]; // Digital Outputs
+typedef struct DigIn{
+  DigInNr Input;
+  uint8_t*  Port;
+  uint8_t*  DDReg;
+  uint8_t  Number;
+  uint8_t  State;
+}DigIn_t;
+
+DigOut_t  DigOutArray_t[16]; // Digital Outputs  for Power Unit and Interface Unit
+DigIn_t   DigInArray_t[12]; // Digital Inputs   for Interface Unit
 
 #endif /* INITECU_H_ */
