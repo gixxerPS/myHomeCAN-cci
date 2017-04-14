@@ -28,21 +28,21 @@ void InitISR(void);
 #define VERSION_HIGH   0x0
 
 typedef enum {	DO_01 = 1,
-        		DO_02,
-				DO_03,
-				DO_04,
-				DO_05,
-				DO_06,
-				DO_07,
-				DO_08,
-				DO_09,
-				DO_10,
-				DO_11,
-				DO_12,
-				DO_13,
-				DO_14,
-				DO_15,
-				DO_16,}DigOutNr;
+        		    DO_02,
+				        DO_03,
+				        DO_04,
+				        DO_05,
+				        DO_06,
+				        DO_07,
+				        DO_08,
+				        DO_09,
+				        DO_10,
+				        DO_11,
+				        DO_12,
+				        DO_13,
+				        DO_14,
+				        DO_15,
+				        DO_16,}DigOutNr;
 				
 typedef struct DigOut{
 	DigOutNr Output;
@@ -52,6 +52,6 @@ typedef struct DigOut{
 	uint8_t  State;
 }DigOut_t;
 
-DigOut_t  DigOutArray_t[16];
+DigOut_t  DigOutArray_t[16]; // Digital Outputs
 
 #endif /* INITECU_H_ */

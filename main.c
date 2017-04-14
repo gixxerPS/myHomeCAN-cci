@@ -66,6 +66,7 @@ int main (void)
 {	  
 	/* Insert system clock initialization code here (sysclk_init()). */
 	Identifier_t AliveId_t;
+  Identifier_t RxIdentifier_t;
 	uint8_t OldAliveCounter_u8 = 255;
 	
   InitTimer();
@@ -101,26 +102,27 @@ int main (void)
 	  if (OldAliveCounter_u8 != (uint8_t) AliveMsg.data[3]) // send new Alive message
 	  {
 		  OldAliveCounter_u8 = AliveMsg.data[3];
-		  can_send_message(&AliveMsg);		  
+		  can_send_message(&AliveMsg);  // Send alive Message		  
 	  }
 
 
-    if ( can_get_message(&CommandReceiveMsg) )
+    if ( can_get_message(&CommandReceiveMsg) )    //check for and read new message
     {
-      test_u8 = can_get_message(&CommandReceiveMsg);
-      _delay_ms(10);
-
-      if (DigOutArray_t[0].State == 0)
+      RxIdentifier_t = ReadIdentifier( CommandReceiveMsg.id ); //received message identifier for unit command
+      
+      if (( RxIdentifier_t.TargetFct_u8 == CCiConfig_t.FctId ) && ( RxIdentifier_t.TargetId_u8 == CCiConfig_t.UnitId_u8 )) ///check: Message for this unit
       {
-	    DigOutArray_t[0].State = 1;
-	    SetDigitalOutput( &DigOutArray_t[0] );
+        switch (RxIdentifier_t.TargetFct_u8)
+        {
+          case PowerUnit:
+          SetPowerUnitOutputs(&CommandReceiveMsg);  // read output command and set outputs
+          break;
+                 
+          default:
+          break;
+        }
       }
-      else
-      {
-	    DigOutArray_t[0].State = 0;
-	    SetDigitalOutput( &DigOutArray_t[0] );  
-      }
-   }
+    }   
   }
 
 	
