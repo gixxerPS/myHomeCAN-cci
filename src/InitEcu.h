@@ -68,9 +68,12 @@ typedef struct DigOut{
 typedef struct DigIn{
   DigInNr Input;
   uint8_t*  Port;
+  uint8_t*  Pin;
   uint8_t*  DDReg;
   uint8_t  Number;
   uint8_t  State;
+  uint8_t  StateTime05s_u8;  //0b001 = 0,5s; 0b010 = 1s; 0b011 = 1,5s... 0b111 = 3s
+  uint8_t  HalfSecCount_u8;
 }DigIn_t;
 
 DigOut_t  DigOutArray_t[16]; // Digital Outputs  for Power Unit and Interface Unit

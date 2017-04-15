@@ -44,30 +44,38 @@
 
 can_t AliveMsg;
 can_t CommandReceiveMsg;
+can_t DigitInputStateMsg;
+
+Identifier_t AliveId_t;
+Identifier_t RxIdentifier_t;
+Identifier_t TxIdentifier_t;
 
 volatile uint8_t test_u8 = 0;
 
-ISR( TIMER1_OVF_vect ) 
+ISR( TIMER1_OVF_vect ) //ca. 260ms
 {
-   // Alive inkrement
-	AliveMsg.data[3] +=1;
+  static uint8_t inkr_u8;
+  
+  inkr_u8++;
+  QuarterSecondCounter_u8++;
+
+  
+  // Alive inkrement
+  if (!(inkr_u8 % 4))   //ca.1s
+  {
+	  AliveMsg.data[4] ++;
+  }   
 }
 
 ISR(INT0_vect)  // CAN Interrupt
 {
-
-
-
-
-    
+  
 
 }
 
 int main (void)
 {	  
 	/* Insert system clock initialization code here (sysclk_init()). */
-	Identifier_t AliveId_t;
-  Identifier_t RxIdentifier_t;
 	uint8_t OldAliveCounter_u8 = 255;
 	
   InitTimer();
@@ -89,24 +97,55 @@ int main (void)
 	AliveMsg.id = BuildIdentifier( AliveId_t);
 /* END: Build Identifier for Alive message*/
 
+/* START: Content for Identifier */
 	AliveMsg.flags.rtr = 0;
 	AliveMsg.flags.extended = 1; //extendet ID
 	AliveMsg.length = 8;         //DLC
-	AliveMsg.data[0] = VERSION_HIGH;  //Software Version
-	AliveMsg.data[1] = VERSION_MID;
-	AliveMsg.data[2] = VERSION_LOW;
+	AliveMsg.data[7] = VERSION_HIGH;  //Software Version
+	AliveMsg.data[6] = VERSION_MID;
+	AliveMsg.data[5] = VERSION_LOW;
+/* END: Content for Identifier */
+
+/* START: Build identifier for Interface unit */
+if (CCiConfig_t.FctId == InterfaceUnit)
+{
+	TxIdentifier_t.Number_u8 = 1;  // Interface message is message number 1
+	TxIdentifier_t.SrcFct_u8 = CCiConfig_t.FctId; //as configured via DIP
+	TxIdentifier_t.SrcId_u8 = CCiConfig_t.UnitId_u8;  //as configured via DIP
+	TxIdentifier_t.TargetFct_u8 = Master;  // Master
+	TxIdentifier_t.TargetId_u8 = 0;   // there´s only one master :-)
+	TxIdentifier_t.Prio_u8 = 0;       // for future use
+  
+  DigitInputStateMsg.id = BuildIdentifier( TxIdentifier_t); // Build identifier
+} 
+/* END: Build identifier for interface unit */
+
+  DigitInputStateMsg.flags.rtr = 0;
+  DigitInputStateMsg.flags.extended = 1; //extendet ID
+  DigitInputStateMsg.length = 8;         //DLC
 
 
 	
 	for(;;)
 	{
-	  if (OldAliveCounter_u8 != (uint8_t) AliveMsg.data[3]) // send new Alive message
+    /* ------------------------ALIVE--------------------------------*/
+	  if (OldAliveCounter_u8 != (uint8_t) AliveMsg.data[4]) // send new Alive message
 	  {
-		  OldAliveCounter_u8 = AliveMsg.data[3];
+		  OldAliveCounter_u8 = AliveMsg.data[4];
 		  can_send_message(&AliveMsg);  // Send alive Message		  
 	  }
+    
+    /*-----------------SEND STATES----------------------------------*/
+    if (CCiConfig_t.FctId == InterfaceUnit)
+    {
+      if ( true == GetAllDigitalInputStates()) // Read digital inputs an send message if function return true
+      {
+        SendDigitalInputStates(&DigitInputStateMsg);
+       
+      } 
+    }
 
-
+   /*--------------------RECEIVE COMMANDS-----------------------------*/ 
     if ( can_get_message(&CommandReceiveMsg) )    //check for and read new message
     {
       RxIdentifier_t = ReadIdentifier( CommandReceiveMsg.id ); //received message identifier for unit command

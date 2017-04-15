@@ -119,6 +119,88 @@ void InitI0I(void)
 	    }
     }
     
+    //Inputs
+	  DigInArray_t[0].Input = DI_01;
+	  DigInArray_t[0].Number = PC0; 
+	  DigInArray_t[0].Port = &PORTC;
+    DigInArray_t[0].Pin = &PINC;
+	  DigInArray_t[0].DDReg = &DDRC;
+	  
+	  DigInArray_t[1].Input = DI_02;
+	  DigInArray_t[1].Number = PC0;
+	  DigInArray_t[1].Port = &PORTC;
+    DigInArray_t[1].Pin = &PINC;
+	  DigInArray_t[1].DDReg = &DDRC;
+	  
+	  DigInArray_t[2].Input = DI_03;
+	  DigInArray_t[2].Number = PC0;
+	  DigInArray_t[2].Port = &PORTC;
+    DigInArray_t[2].Pin = &PINC;
+	  DigInArray_t[2].DDReg = &DDRC;
+	  
+	  DigInArray_t[3].Input = DI_04;
+	  DigInArray_t[3].Number = PC0;
+	  DigInArray_t[3].Port = &PORTC;
+    DigInArray_t[3].Pin = &PINC;
+	  DigInArray_t[3].DDReg = &DDRC;
+	  
+	  DigInArray_t[4].Input = DI_05;
+	  DigInArray_t[4].Number = PC0;
+	  DigInArray_t[4].Port = &PORTC;
+    DigInArray_t[4].Pin = &PINC;
+	  DigInArray_t[4].DDReg = &DDRC;
+	  
+	  DigInArray_t[5].Input = DI_06;
+	  DigInArray_t[5].Number = PC0;
+	  DigInArray_t[5].Port = &PORTC;
+    DigInArray_t[5].Pin = &PINC;
+	  DigInArray_t[5].DDReg = &DDRC;
+
+	  DigInArray_t[6].Input = DI_07;
+	  DigInArray_t[6].Number = PC0;
+	  DigInArray_t[6].Port = &PORTC;
+    DigInArray_t[6].Pin = &PINC;
+	  DigInArray_t[6].DDReg = &DDRC;
+	  
+	  DigInArray_t[7].Input = DI_08;
+	  DigInArray_t[7].Number = PC0;
+	  DigInArray_t[7].Port = &PORTD;
+    DigInArray_t[7].Pin = &PINC;
+	  DigInArray_t[7].DDReg = &DDRD;
+	  
+	  DigInArray_t[8].Input = DI_09;
+	  DigInArray_t[8].Number = PC0;
+	  DigInArray_t[8].Port = &PORTD;
+    DigInArray_t[8].Pin = &PINC;
+	  DigInArray_t[8].DDReg = &DDRD;
+	  
+	  DigInArray_t[9].Input = DI_10;
+	  DigInArray_t[9].Number = PC0;
+	  DigInArray_t[9].Port = &PORTD;
+    DigInArray_t[9].Pin = &PINC;
+	  DigInArray_t[9].DDReg = &DDRD;
+	  
+	  DigInArray_t[10].Input = DI_11;
+	  DigInArray_t[10].Number = PC0;
+	  DigInArray_t[10].Port = &PORTD;
+    DigInArray_t[10].Pin = &PINC;
+	  DigInArray_t[10].DDReg = &DDRD;
+	  
+	  DigInArray_t[11].Input = DI_12;
+	  DigInArray_t[11].Number = PC0;
+	  DigInArray_t[11].Port = &PORTD;
+    DigInArray_t[11].Pin = &PINC;
+	  DigInArray_t[11].DDReg = &DDRD;
+    
+    if (CCiConfig_t.FctId == InterfaceUnit)  //12 inputs for interface unit
+    {
+      for (uint8_t i = 0; i< DI_12; i++)
+      {
+        *DigInArray_t[i].DDReg &= ~((char) 1 << DigInArray_t[i].Number); // configure pin as input
+        *DigInArray_t[i].Port |= (1<<DigInArray_t[i].Number); // Set Pull Up      
+      }
+    }
+    
     break; 
 	  
     default:
@@ -136,8 +218,8 @@ void InitI0I(void)
 
 void InitTimer(void)
 {
-  TCCR1B |= ( 1<<CS12 )|( 0<<CS10 );  // counter0,Prescaler auf 1024
-  TIMSK |= ( 1<<TOIE1 ); // enable counter0 overflow interrupt		
+  TCCR1B |= ( 1<<CS11 )|( 1<<CS10 );  // counter1,Prescaler auf 256 (ca. 260ms per overflow)
+  TIMSK |= ( 1<<TOIE1 ); // enable counter1 overflow interrupt		
 }
 
 void InitISR(void)
