@@ -163,7 +163,7 @@ int main (void)
     	}
   	}
     // OUTPUT CHECK for testing!!
-    SetInterfaceUnitOutputs(&CommandReceiveMsg);
+   // SetInterfaceUnitOutputs(&CommandReceiveMsg);
     
     
   	/*--------------------RECEIVE COMMANDS-----------------------------*/
