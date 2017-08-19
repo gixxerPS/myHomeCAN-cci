@@ -115,9 +115,6 @@ uint8_t mcp2515_get_message(can_t *msg)
 	else
 		mcp2515_bit_modify(CANINTF, (1<<RX1IF), 0);
 	
-    mcp2515_bit_modify(CANINTF, (1<<ERRIF), 0);
-    mcp2515_bit_modify(CANINTF, (1<<MERRF), 0);
-  
 	CAN_INDICATE_RX_TRAFFIC_FUNCTION;
 	
 	#ifdef RXnBF_FUNKTION

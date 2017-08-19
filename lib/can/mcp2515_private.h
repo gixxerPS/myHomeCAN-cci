@@ -67,7 +67,7 @@
 		#define	P_MISO	B,4
 		#define	P_SCK	B,5
 		#define	SUPPORT_FOR_MCP2515__
-	#elif defined(__AVR_ATmega128__)
+	#elif defined(__AVR_ATmega128__) || defined(__AVR_ATmega64__)
 		#define	P_MOSI	B,2
 		#define	P_MISO	B,3
 		#define	P_SCK	B,1
@@ -91,7 +91,7 @@
 // load some default values
 
 #ifndef	MCP2515_CLKOUT_PRESCALER
-	#define	MCP2515_CLKOUT_PRESCALER	0
+	#define	MCP2515_CLKOUT_PRESCALER	1
 #endif
 #ifndef	MCP2515_INTERRUPTS
 	#define	MCP2515_INTERRUPTS			(1<<RX1IE)|(1<<RX0IE)

@@ -149,8 +149,7 @@ prog_uint8_t _mcp2515_cnf[8][3] = {
 	// 125 kbps
 	{	(1<<PHSEG21),					// CNF3
 		(1<<BTLMODE)|(1<<PHSEG11),		// CNF2
-		(1<<BRP1)|(1<<BRP0)//(1<<BRP2)|(1<<BRP1)|(1<<BRP0)	// CNF1
-		
+		(1<<BRP2)|(1<<BRP1)|(1<<BRP0)	// CNF1
 	},
 	// 250 kbps
 	{	0x03,
@@ -206,40 +205,21 @@ bool mcp2515_init(uint8_t bitrate)
 	RESET(MCP2515_CS);
 	spi_putc(SPI_WRITE);
 	spi_putc(CNF3);
-	//spi_putc(2);
-	spi_putc(_mcp2515_cnf[bitrate][0]);
-	
-	spi_putc(CNF1);
-	//spi_putc(3);
-	spi_putc(_mcp2515_cnf[bitrate][2]);
-		
-	spi_putc(CNF2);
-	//spi_putc(144);
-	spi_putc(_mcp2515_cnf[bitrate][1]);
-	for (uint8_t i=0; i<3 ;i++ ) {
+
+	// TEST replace for loop with explicit setting for 125kbps
+//	for (uint8_t i=0; i<3 ;i++ ) {
 //		spi_putc(pgm_read_byte(&_mcp2515_cnf[bitrate][i]));
-	}
-	
-	
-	
+//	}
+	spi_putc((1<<PHSEG21));
+	spi_putc((1<<BTLMODE)|(1<<PHSEG11));
+	spi_putc((1<<BRP2)|(1<<BRP1)|(1<<BRP0));
+
 	// aktivieren/deaktivieren der Interrupts
-	//spi_putc(MCP2515_INTERRUPTS);
-	mcp2515_write_register(CANINTE, (1<<RX1IE)|(1<<RX0IE));
-	
+	spi_putc(MCP2515_INTERRUPTS);
 	SET(MCP2515_CS);
+	
 	// TXnRTS Bits als Inputs schalten
 	mcp2515_write_register(TXRTSCTRL, 0);
-	
-	mcp2515_write_register( RXM0SIDH, 0 );
-    mcp2515_write_register( RXM0SIDL, 0 );
-	mcp2515_write_register( RXM0EID8, 0 );
-	mcp2515_write_register( RXM0EID0, 0 );
-	    
-	mcp2515_write_register( RXM1SIDH, 0 );
-	mcp2515_write_register( RXM1SIDL, 0 );
-	mcp2515_write_register( RXM1EID8, 0 );
-	mcp2515_write_register( RXM1EID0, 0 );
-	
 	
 	#if defined(MCP2515_INT)
 		SET_INPUT(MCP2515_INT);

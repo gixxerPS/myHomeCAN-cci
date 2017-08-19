@@ -55,7 +55,6 @@
 // ----------------------------------------------------------------------------
 
 #include <avr/pgmspace.h>
-//#include <pgmspace.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -69,8 +68,6 @@
 #define	ONLY_NON_RTR		2
 #define	ONLY_RTR			3
 //@}
-
-typedef uint8_t prog_uint8_t;
 
 /** \ingroup	can_interface
  *  \brief		Bitraten fuer den CAN-Bus 

@@ -1,6 +1,9 @@
 #ifndef	CONFIG_H
 #define	CONFIG_H
 
+#include <inttypes.h>
+typedef const uint8_t   prog_uint8_t __attribute__((__progmem__));
+
 // -----------------------------------------------------------------------------
 /* Global settings for building the can-lib and application program.
  *
@@ -42,17 +45,20 @@
  * Remember NOT to use them in your application!
  * It is a good idea to use bits from the port that carries MOSI, MISO, SCK.
  */
-#define	MCP2515_CS				B,4
+#define	MCP2515_CS				B,0
 #define	MCP2515_INT				D,2
+
+// ATmega clock is supplied by mcp clock so enable clkout
+#define MCP2515_CLKOUT_PRESCALER 1
 
 // -----------------------------------------------------------------------------
 // Setting for SJA1000
 
-//#define	SJA1000_INT				E,0
-//#define	SJA1000_MEMORY_MAPPED	1
+#define	SJA1000_INT				E,0
+#define	SJA1000_MEMORY_MAPPED	1
 
 // memory-mapped interface
-//#define	SJA1000_BASE_ADDR		0x8000		// for ATMega162
+#define	SJA1000_BASE_ADDR		0x8000		// for ATMega162
 
 /*
 // port-interface
