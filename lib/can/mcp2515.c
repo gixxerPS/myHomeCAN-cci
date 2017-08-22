@@ -212,7 +212,8 @@ bool mcp2515_init(uint8_t bitrate)
 //	}
 	spi_putc((1<<PHSEG21));
 	spi_putc((1<<BTLMODE)|(1<<PHSEG11));
-	spi_putc((1<<BRP2)|(1<<BRP1)|(1<<BRP0));
+  spi_putc((1<<BRP1)|(1<<BRP0));
+  //	spi_putc((1<<BRP2)|(1<<BRP1)|(1<<BRP0));    // Daniel´s Version
 
 	// aktivieren/deaktivieren der Interrupts
 	spi_putc(MCP2515_INTERRUPTS);
