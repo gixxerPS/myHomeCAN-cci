@@ -149,7 +149,7 @@ prog_uint8_t _mcp2515_cnf[8][3] = {
 	// 125 kbps
 	{	(1<<PHSEG21),					// CNF3
 		(1<<BTLMODE)|(1<<PHSEG11),		// CNF2
-		(1<<BRP2)|(1<<BRP1)|(1<<BRP0)	// CNF1
+		(1<<BRP2)|(1<<BRP1)|(1<<BRP3)	// CNF1
 	},
 	// 250 kbps
 	{	0x03,
@@ -189,6 +189,7 @@ bool mcp2515_init(uint8_t bitrate)
 	// SPI Einstellung setzen
 	mcp2515_spi_init();
 	
+ // _delay_ms(10);
 	// MCP2515 per Software Reset zuruecksetzten,
 	// danach ist er automatisch im Konfigurations Modus
 	RESET(MCP2515_CS);
@@ -212,8 +213,8 @@ bool mcp2515_init(uint8_t bitrate)
 //	}
 	spi_putc((1<<PHSEG21));
 	spi_putc((1<<BTLMODE)|(1<<PHSEG11));
-  spi_putc((1<<BRP1)|(1<<BRP0));
-  //	spi_putc((1<<BRP2)|(1<<BRP1)|(1<<BRP0));    // Daniel´s Version
+  //spi_putc((1<<BRP1)|(1<<BRP0));
+ spi_putc((1<<BRP2)|(1<<BRP1)|(1<<BRP0));    // Daniel´s Version
 
 	// aktivieren/deaktivieren der Interrupts
 	spi_putc(MCP2515_INTERRUPTS);
@@ -250,7 +251,8 @@ bool mcp2515_init(uint8_t bitrate)
 	// Testen ob das auf die beschreibenen Register zugegriffen werden kann
 	// (=> ist der Chip ueberhaupt ansprechbar?)
 	bool error = false;
-	if (mcp2515_read_register(CNF2) != pgm_read_byte(&_mcp2515_cnf[bitrate][1])) {
+//	if (mcp2515_read_register(CNF2) != pgm_read_byte(&_mcp2515_cnf[bitrate][1])) {
+  	if (mcp2515_read_register(CNF2) != 0x90) {
 		error = true;
 	}
 	

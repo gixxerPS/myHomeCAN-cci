@@ -97,7 +97,8 @@ int main (void)
   GetUnitId(); // 0 - 31
   GetFctId();  // Sensor Unit, Power Unit, Interface Unit
   InitI0I();   // depends on via DIP configured function
-	_delay_ms(10);
+	_delay_ms(100);
+  
 	can_init(BITRATE_125_KBPS);
  
   
@@ -180,7 +181,7 @@ int main (void)
         	break;
         	
         	case InterfaceUnit:
-        	//SetInterfaceUnitOutputs(&CommandReceiveMsg); // read output command and set outputs
+        	SetInterfaceUnitOutputs(&CommandReceiveMsg); // read output command and set outputs
         	break;
         	
         	default:
