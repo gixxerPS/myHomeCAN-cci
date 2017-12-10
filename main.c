@@ -30,6 +30,7 @@
  */
 
 #define F_CPU 16000000UL
+#define TEST_MODE  0b11111
 
 #include "InitEcu.h"
 #include <util/delay.h>
@@ -41,8 +42,8 @@
 #include "Identifier.h"
 #include "PowerUnit.h"
 #include "InterfaceUnit.h"
-
-
+#include "TestMode.h"
+ 
   can_t AliveMsg;
   can_t CommandReceiveMsg;
   can_t DigitInputStateMsg;
@@ -68,27 +69,70 @@
       AliveMsg.data[4] ++;
     }
     
-    if ( LedState_u8 == 0)  //Power ON
+    if ( CCiConfig_t.UnitId_u8 != TEST_MODE)
     {
-      PORTB |= (1<<PB4);      //select Port
-      LedState_u8 = 1;
+      if ( LedState_u8 == 0)  //Power ON
+      {
+        SET_STATUS_LED();
+        //PORTB |= (1<<STATUS_LED);      //select Port
+        LedState_u8 = 1;
+      }
+      else
+      {
+        RESET_STATUS_LED();
+        LedState_u8 = 0;
+        //PORTB &= ~((char)1<<STATUS_LED);  //Power OFF
+      }  
     }
-    else
+  }
+  
+  ISR( TIMER0_COMP_vect)
+  {
+    static uint8_t inkr_u8 = 0;
+      
+    TCNT0 = 0;
+    
+    switch( inkr_u8 )
     {
-      LedState_u8 = 0;
-      PORTB &= ~((char)1<<PB4);  //Power OFF
+      case T50MS: 
+       GlobalTimer.t50ms_u8++;
+       break;    
+      case T100MS: 
+        GlobalTimer.t100ms_u8++;
+        break;      
+      case T200MS:
+        GlobalTimer.t200ms_u8++;
+        break;
+      case T500MS: 
+        GlobalTimer.t500ms_u8++;
+        break;
+      case T1000MS: 
+        GlobalTimer.t1000ms_u8++;
+        break;
+      case T2000MS:
+        GlobalTimer.t2000ms_u8++;
+        break;
     }
+      
+    if ( inkr_u8 < 200) // 100 * 10ms -> 1s
+    {
+      inkr_u8++;
+    }
+    else   // 1s reached
+    {
+      inkr_u8 = 0;
+      
+    } 
   }
 
   ISR(INT0_vect)  // CAN Interrupt
   {
-    
-
   }
+  
+
 
 int main (void)
-{	  
-  static uint8_t LedState_u8;
+{	   
 	/* Insert system clock initialization code here (sysclk_init()). */
 	uint8_t OldAliveCounter_u8 = 255;
 	
@@ -100,7 +144,6 @@ int main (void)
 	_delay_ms(100);
   
 	can_init(BITRATE_125_KBPS);
- 
   
 /* START: Build Identifier for Alive message*/
 
@@ -135,6 +178,8 @@ int main (void)
     
     DigitInputStateMsg.id = BuildIdentifier( TxIdentifier_t); // Build identifier
   }
+  
+
   /* END: Build identifier for interface unit */
 
   DigitInputStateMsg.flags.rtr = 0;
@@ -144,9 +189,7 @@ int main (void)
 
 	
 	for(;;)
-	{
-    
-  
+	{ 
     /* ------------------------ALIVE--------------------------------*/
   	if (OldAliveCounter_u8 != (uint8_t) AliveMsg.data[4]) // send new Alive message
   	{
@@ -159,16 +202,25 @@ int main (void)
   	{
     	if ( true == GetAllDigitalInputStates()) // Read digital inputs an send message if function return true
     	{
-      	SendDigitalInputStates(&DigitInputStateMsg);
-      	
+      	SendDigitalInputStates(&DigitInputStateMsg);    	
     	}
   	}
-    // OUTPUT CHECK for testing!!
-   // SetInterfaceUnitOutputs(&CommandReceiveMsg);
-    
-    
+
+    /*--------------------TEST MODE-----------------------------*/
+    if ( CCiConfig_t.UnitId_u8 == TEST_MODE)  // UnitId only checked once at startup
+    {             
+      if (CCiConfig_t.FctId == InterfaceUnit)
+      {
+        InputCheck(); 
+        OutputCheck();                       
+      }
+      else if (CCiConfig_t.FctId == PowerUnit)
+      {
+        OutputCheck();
+      }        
+    }      
   	/*--------------------RECEIVE COMMANDS-----------------------------*/
-  	if ( can_get_message(&CommandReceiveMsg) )    //check for and read new message
+  	else if ( can_get_message(&CommandReceiveMsg) )    //check for and read new message
   	{
     	RxIdentifier_t = ReadIdentifier( CommandReceiveMsg.id ); //received message identifier for unit command
     	

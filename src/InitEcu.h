@@ -21,11 +21,24 @@ void InitI0I(void);
 void InitTimer(void);
 void InitISR(void);
 
+#define SET_STATUS_LED() (PORTB |= (1<<STATUS_LED))
+#define RESET_STATUS_LED() (PORTB &= ~((char)1<<STATUS_LED))
+
 #define ALL_PORTS_ON 0xff
+#define NUMBER_IU_INPUTS  12
+#define NUMBER_IU_OUTPUTS 12
+#define NUMBER_PU_OUTPUTS  16
 
 #define VERSION_LOW    0x1
 #define VERSION_MID    0x0
 #define VERSION_HIGH   0x0
+
+#define T2000MS  200
+#define T1000MS  100
+#define  T500MS   50
+#define  T200MS   20
+#define  T100MS   10
+#define   T50MS    5
 
 typedef enum {	DO_01 = 1,
         		    DO_02,
@@ -76,7 +89,18 @@ typedef struct DigIn{
   uint8_t  HalfSecCount_u8;
 }DigIn_t;
 
+typedef struct
+{
+  uint8_t t50ms_u8;
+  uint8_t t100ms_u8;
+  uint8_t t200ms_u8;
+  uint8_t t500ms_u8;
+  uint8_t t1000ms_u8;
+  uint8_t t2000ms_u8;
+} Timer_t;
+
 DigOut_t  DigOutArray_t[16]; // Digital Outputs  for Power Unit and Interface Unit
 DigIn_t   DigInArray_t[12]; // Digital Inputs   for Interface Unit
+Timer_t GlobalTimer;  // Timer for global purposes
 
 #endif /* INITECU_H_ */

@@ -210,15 +210,24 @@ void InitI0I(void)
   }
 
  /* STATUS LED */
-  DDRB |= (1 << PB4);
+  DDRB |= (1 << STATUS_LED);
   return;	
 }
 
 
 void InitTimer(void)
 {
+  // Timer1 (16bit) overflow interrupt used for alive handling
+  // Timer0 (8Bit) overflow interrupt used for test mode
+  
+  //Timer1
   TCCR1B |= ( 1<<CS11 )|( 1<<CS10 );  // counter1,Prescaler auf 256 (ca. 260ms per overflow)
-  TIMSK |= ( 1<<TOIE1 ); // enable counter1 overflow interrupt		
+  //Timer 0
+  TCCR0 |= (1<<CS02)|( 1<<CS01 )|( 1<<CS00 );  // counter0,Prescaler auf 1024 (ca. 60Hz Overflow)
+  OCR0 = 156; // 1 / 16MHz * 156 (otuput compare interrupt) * 1024 (Prescaler Timer 0) -> 10ms
+  TCNT0 = 0; // Reset timer inital
+  
+  TIMSK |= ( 1<<TOIE1 ) | ( 1<< OCIE0 ); // enable counter1 overflow interrupt	and Timer 0 output compare	
 }
 
 void InitISR(void)
