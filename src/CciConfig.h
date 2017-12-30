@@ -25,7 +25,6 @@
   }Config_t;
   
   Config_t CCiConfig_t;
-
 /*DECLARATIONS*/
   void GetUnitId(void);
   void GetFctId(void);

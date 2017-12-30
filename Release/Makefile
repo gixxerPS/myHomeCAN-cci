@@ -77,6 +77,7 @@ C_SRCS +=  \
 ../lib/can/spi.c \
 ../main.c \
 ../src/CciConfig.c \
+../src/TestMode.c \
 ../src/InitEcu.c \
 ../src/InterfaceUnit/InterfaceUnit.c \
 ../src/PowerUnit/PowerUnit.c
@@ -124,6 +125,7 @@ lib/can/sja1000_set_mode.o \
 lib/can/spi.o \
 main.o \
 src/CciConfig.o \
+src/TestMode.o \
 src/InitEcu.o \
 src/InterfaceUnit/InterfaceUnit.o \
 src/PowerUnit/PowerUnit.o
@@ -164,6 +166,7 @@ lib/can/sja1000_set_mode.o \
 lib/can/spi.o \
 main.o \
 src/CciConfig.o \
+src/TestMode.o \
 src/InitEcu.o \
 src/InterfaceUnit/InterfaceUnit.o \
 src/PowerUnit/PowerUnit.o
@@ -204,6 +207,7 @@ lib/can/sja1000_set_mode.d \
 lib/can/spi.d \
 main.d \
 src/CciConfig.d \
+src/TestMode.d \
 src/InitEcu.d \
 src/InterfaceUnit/InterfaceUnit.d \
 src/PowerUnit/PowerUnit.d
@@ -244,6 +248,7 @@ lib/can/sja1000_set_mode.d \
 lib/can/spi.d \
 main.d \
 src/CciConfig.d \
+src/TestMode.d \
 src/InitEcu.d \
 src/InterfaceUnit/InterfaceUnit.d \
 src/PowerUnit/PowerUnit.d
@@ -262,6 +267,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

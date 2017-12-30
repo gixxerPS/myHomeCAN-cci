@@ -15,7 +15,7 @@ void InputCheck()
   {
     TempGlobalTimer_u8 = GlobalTimer.t200ms_u8;  // blink 2,5Hz if only one input active
                                                      
-    if (TempGlobalTimer_u8 % 1)
+    if (TempGlobalTimer_u8 % 2)
     {
       SET_STATUS_LED();
     }
@@ -28,7 +28,7 @@ void InputCheck()
   {
     TempGlobalTimer_u8 = GlobalTimer.t50ms_u8;   //blink fast if more than one input active
         
-    if (TempGlobalTimer_u8 % 1)
+    if (TempGlobalTimer_u8 % 2)
     {
       SET_STATUS_LED();
     }
