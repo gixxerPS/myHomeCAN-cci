@@ -74,14 +74,12 @@
       if ( LedState_u8 == 0)  //Power ON
       {
         SET_STATUS_LED();
-        //PORTB |= (1<<STATUS_LED);      //select Port
         LedState_u8 = 1;
       }
       else
       {
         RESET_STATUS_LED();
         LedState_u8 = 0;
-        //PORTB &= ~((char)1<<STATUS_LED);  //Power OFF
       }  
     }
   }
@@ -92,36 +90,41 @@
       
     TCNT0 = 0;
     
-    switch( inkr_u8 )
+    if ( inkr_u8> 0 )
     {
-      case T50MS: 
-       GlobalTimer.t50ms_u8++;
-       break;    
-      case T100MS: 
+      if ( (inkr_u8 % T50MS) == 0)
+      {
+        GlobalTimer.t50ms_u8++;
+      }
+      if ( (inkr_u8 % T100MS) == 0)
+      {
         GlobalTimer.t100ms_u8++;
-        break;      
-      case T200MS:
+      }
+      if ( (inkr_u8 % T200MS) == 0)
+      {
         GlobalTimer.t200ms_u8++;
-        break;
-      case T500MS: 
+      }       
+      if ( (inkr_u8 % T500MS) == 0)
+      {
         GlobalTimer.t500ms_u8++;
-        break;
-      case T1000MS: 
+      }
+      if ( (inkr_u8 % T1000MS) == 0)
+      {
         GlobalTimer.t1000ms_u8++;
-        break;
-      case T2000MS:
+      } 
+      if ( (inkr_u8 % T2000MS) == 0)
+      {
         GlobalTimer.t2000ms_u8++;
-        break;
+      }       
     }
       
-    if ( inkr_u8 < 200) // 100 * 10ms -> 1s
+    if ( inkr_u8 < 200) // 200 * 10ms -> 2s
     {
       inkr_u8++;
     }
-    else   // 1s reached
+    else   // 2s reached
     {
-      inkr_u8 = 0;
-      
+      inkr_u8 = 0; 
     } 
   }
 
@@ -190,9 +193,10 @@ int main (void)
 	
 	for(;;)
 	{ 
+    
     /* ------------------------ALIVE--------------------------------*/
-  	if (OldAliveCounter_u8 != (uint8_t) AliveMsg.data[4]) // send new Alive message
-  	{
+  	if (OldAliveCounter_u8 != (uint8_t) AliveMsg.data[4]) // send new Alive message because counter has changed
+  	{                                                                                         
     	OldAliveCounter_u8 = AliveMsg.data[4];
     	can_send_message(&AliveMsg);  // Send alive Message
   	}
@@ -200,7 +204,7 @@ int main (void)
   	/*-----------------SEND STATES----------------------------------*/
   	if (CCiConfig_t.FctId == InterfaceUnit)
   	{
-    	if ( true == GetAllDigitalInputStates()) // Read digital inputs an send message if function return true
+    	if ( true == GetAllDigitalInputStates()) // Read digital inputs an send message if function return true (changed input state)
     	{
       	SendDigitalInputStates(&DigitInputStateMsg);    	
     	}
@@ -211,12 +215,12 @@ int main (void)
     {             
       if (CCiConfig_t.FctId == InterfaceUnit)
       {
-        InputCheck(); 
-        OutputCheck();                       
+        InputCheck();  // if only one input is active, LED blinks fast. If more than one input is active LED blinks very fast
+        OutputCheck(); // if no inputs active, cci switches outputs (1 output / 2 seconds)                    
       }
       else if (CCiConfig_t.FctId == PowerUnit)
       {
-        OutputCheck();
+        OutputCheck(); //cci switches outputs (1 output / 2 seconds) 
       }        
     }      
   	/*--------------------RECEIVE COMMANDS-----------------------------*/

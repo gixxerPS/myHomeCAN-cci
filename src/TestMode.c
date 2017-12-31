@@ -44,20 +44,23 @@ void OutputCheck()
   static uint8_t TempGlobalTimer_u8 = 0;
   static uint8_t i = 0;  
   
-  if (( TempGlobalTimer_u8 != GlobalTimer.t1000ms_u8) && (GetNumOfActiveInputs_u8() == 0))    // no input active
+  if (( TempGlobalTimer_u8 != GlobalTimer.t500ms_u8) && (GetNumOfActiveInputs_u8() == 0))    // no input active
   {
-    TempGlobalTimer_u8 = GlobalTimer.t1000ms_u8;  // blink 0,5Hz if only one input active
+    TempGlobalTimer_u8 = GlobalTimer.t500ms_u8;  // blink 0,5Hz if only one input active
     
     if ( TempGlobalTimer_u8 % 2) // change every 2 seconds
     {
+      SET_STATUS_LED();
       if ( i< NUMBER_PU_OUTPUTS )
       {
         if ( i > 0 ) 
         {
           DigOutArray_t[i-1].State = 0; // clear last output
+          SetDigitalOutputPU( &DigOutArray_t[i-1] );
         }
         
         DigOutArray_t[i].State = 1; // set output
+        SetDigitalOutputPU( &DigOutArray_t[i] );
         
         i++;         
       }
@@ -65,8 +68,13 @@ void OutputCheck()
       {
         i = 0;
         DigOutArray_t[NUMBER_PU_OUTPUTS-1].State = 0;     // clear last output
+        SetDigitalOutputPU( &DigOutArray_t[NUMBER_PU_OUTPUTS-1] );
       }
-    }    
+    } 
+    else
+    {
+      RESET_STATUS_LED();
+    }   
   }
 }
 
