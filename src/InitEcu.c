@@ -221,7 +221,7 @@ void InitTimer(void)
   // Timer0 (8Bit) overflow interrupt used for test mode
   
   //Timer1
-  TCCR1B |= ( 1<<CS11 )|( 1<<CS10 );  // counter1,Prescaler auf 256 (ca. 260ms per overflow)
+  TCCR1B = ( 1<<CS11 )|( 1<<CS10 );  // counter1,Prescaler auf 256 (ca. 260ms per overflow)
   //Timer 0
   TCCR0 |= (1<<CS02)|( 1<<CS01 )|( 1<<CS00 );  // counter0,Prescaler auf 1024 (ca. 60Hz Overflow)
   OCR0 = 156; // 1 / 16MHz * 156 (otuput compare interrupt) * 1024 (Prescaler Timer 0) -> 10ms

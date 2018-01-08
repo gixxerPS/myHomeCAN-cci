@@ -135,10 +135,10 @@
 
 
 int main (void)
-{	   
+{	  
 	/* Insert system clock initialization code here (sysclk_init()). */
 	uint8_t OldAliveCounter_u8 = 255;
-	
+  _delay_ms(1000);
   InitTimer();
   InitISR();   // Timer and IO Interrupt
   GetUnitId(); // 0 - 31
