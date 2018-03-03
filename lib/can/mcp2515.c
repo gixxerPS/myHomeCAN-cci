@@ -66,6 +66,31 @@
 	#error	invaild value of MCP2515_CLKOUT_PRESCALER
 #endif
 
+// ----------------------------------------------------------------------------
+const static uint8_t PROGMEM mcp2515_register_map[45] = {
+	0xff, 0xc0, 0x00, 0x00,				// Filter 0
+	0xff, 0xc0, 0x00, 0x00,				// Filter 1
+	0xff, 0xc0, 0x00, 0x00,				// Filter 2
+  0,									// BFPCTRL
+  0x38,									// TXRTSCTRL
+  0,									// CANSTAT (read-only)
+  (1<<REQOP2) | (CLKOUT_PRESCALER_),	// CANCTRL
+	0xff, 0xc0, 0x00, 0x00,				// Filter 3
+	0xff, 0xc0, 0x00, 0x00,				// Filter 4
+	0xff, 0xc0, 0x00, 0x00,				// Filter 5
+  0,									// TEC (read-only)
+  0,									// REC (read-only)
+  0,									// CANSTAT (read-only)
+  (1<<REQOP2) | (CLKOUT_PRESCALER_),	// CANCTRL
+	0xff, 0xc0, 0x00, 0x00,				// Mask 0
+	0xff, 0xc0, 0x00, 0x00,				// Mask 1
+  0x02, //CNF3
+  0x90, //CNF2
+  0x07, //CNF1
+  MCP2515_INTERRUPTS,
+  0							// clear interrupt flags
+};
+
 // -------------------------------------------------------------------------
 void mcp2515_write_register( uint8_t adress, uint8_t data )
 {
@@ -124,51 +149,6 @@ uint8_t mcp2515_read_status(uint8_t type)
 }
 
 // -------------------------------------------------------------------------
-
-prog_uint8_t _mcp2515_cnf[8][3] = {
-	// 10 kbps
-	{	0x04,
-		0xb6,
-		0xe7
-	},
-	// 20 kbps
-	{	0x04,
-		0xb6,
-		0xd3
-	},
-	// 50 kbps
-	{	0x04,
-		0xb6,
-		0xc7
-	},
-	// 100 kbps
-	{	0x04,
-		0xb6,
-		0xc3
-	},
-	// 125 kbps
-	{	(1<<PHSEG21),					// CNF3
-		(1<<BTLMODE)|(1<<PHSEG11),		// CNF2
-		(1<<BRP2)|(1<<BRP1)|(1<<BRP3)	// CNF1
-	},
-	// 250 kbps
-	{	0x03,
-		0xac,
-		0x81
-	},
-	// 500 kbps
-	{	0x03,
-		0xac,
-		0x80
-	},
-	// 1 Mbps
-	{	(1<<PHSEG21),
-		(1<<BTLMODE)|(1<<PHSEG11),
-		0
-	}
-};
-
-// -------------------------------------------------------------------------
 bool mcp2515_init(uint8_t bitrate)
 {
 	if (bitrate >= 8)
@@ -189,7 +169,7 @@ bool mcp2515_init(uint8_t bitrate)
 	// SPI Einstellung setzen
 	mcp2515_spi_init();
 	
- // _delay_ms(10);
+  //_delay_ms(10);
 	// MCP2515 per Software Reset zuruecksetzten,
 	// danach ist er automatisch im Konfigurations Modus
 	RESET(MCP2515_CS);
@@ -200,29 +180,23 @@ bool mcp2515_init(uint8_t bitrate)
 	SET(MCP2515_CS);
 	
 	// ein bisschen warten bis der MCP2515 sich neu gestartet hat
-	_delay_ms(10);
-	
-	// CNF1..3 Register laden (Bittiming)
-	RESET(MCP2515_CS);
-	spi_putc(SPI_WRITE);
-	spi_putc(CNF3);
-
-	// TEST replace for loop with explicit setting for 125kbps
-//	for (uint8_t i=0; i<3 ;i++ ) {
-//		spi_putc(pgm_read_byte(&_mcp2515_cnf[bitrate][i]));
-//	}
-	spi_putc((1<<PHSEG21));
-	spi_putc((1<<BTLMODE)|(1<<PHSEG11));
-  //spi_putc((1<<BRP1)|(1<<BRP0));
- spi_putc((1<<BRP2)|(1<<BRP1)|(1<<BRP0));    // Daniel´s Version
-
-	// aktivieren/deaktivieren der Interrupts
-	spi_putc(MCP2515_INTERRUPTS);
-	SET(MCP2515_CS);
+   _delay_ms(0.1);
+  	
+  // Filter usw. setzen
+  RESET(MCP2515_CS);
+  spi_putc(SPI_WRITE);
+  spi_putc(RXF0SIDH);
+  for (uint8_t i = 0; i < sizeof(mcp2515_register_map); i++) {
+   	spi_putc(pgm_read_byte(&mcp2515_register_map[i]));
+  }
+  SET(MCP2515_CS);
+    
+  mcp2515_write_register(RXB0CTRL, (1<<RXM0)|(1<<RXM1));  // open all filters for buffer 0
+  mcp2515_write_register(RXB1CTRL, (1<<RXM0)|(1<<RXM1));  // open all filters for buffer 1
 	
 	// TXnRTS Bits als Inputs schalten
-	mcp2515_write_register(TXRTSCTRL, 0);
-	
+	//mcp2515_write_register(TXRTSCTRL, 0);
+  	
 	#if defined(MCP2515_INT)
 		SET_INPUT(MCP2515_INT);
 		SET(MCP2515_INT);
@@ -232,30 +206,29 @@ bool mcp2515_init(uint8_t bitrate)
 		SET_INPUT(MCP2515_RX0BF);
 		SET_INPUT(MCP2515_RX1BF);
 		
-		SET(MCP2515_RX0BF);
-		SET(MCP2515_RX1BF);
+		SET(MCP2515_RX0BF); 
+		SET(MCP2515_RX1BF); 
 		
 		// Aktivieren der Pin-Funktionen fuer RX0BF und RX1BF
-		mcp2515_write_register(BFPCTRL, (1<<B0BFE)|(1<<B1BFE)|(1<<B0BFM)|(1<<B1BFM));
+//		mcp2515_write_register(BFPCTRL, (1<<B0BFE)|(1<<B1BFE)|(1<<B0BFM)|(1<<B1BFM));
 	#else
 		#ifdef MCP2515_TRANSCEIVER_SLEEP
 			// activate the pin RX1BF as GPIO which is connected 
 			// to RS of MCP2551 and set it to 0
-			mcp2515_write_register(BFPCTRL, (1<<B1BFE));
+	//		mcp2515_write_register(BFPCTRL, (1<<B1BFE));
 		#else
 			// Deaktivieren der Pins RXnBF Pins (High Impedance State)
-			mcp2515_write_register(BFPCTRL, 0);
+	//		mcp2515_write_register(BFPCTRL, 0);
 		#endif
 	#endif
 	
 	// Testen ob das auf die beschreibenen Register zugegriffen werden kann
 	// (=> ist der Chip ueberhaupt ansprechbar?)
 	bool error = false;
-//	if (mcp2515_read_register(CNF2) != pgm_read_byte(&_mcp2515_cnf[bitrate][1])) {
-  	if (mcp2515_read_register(CNF2) != 0x90) {
+  	if (mcp2515_read_register(CNF2) != mcp2515_register_map[CNF2]) {
 		error = true;
 	}
-	
+
 	// Device zurueck in den normalen Modus versetzten
 	// und aktivieren/deaktivieren des Clkout-Pins
 	mcp2515_write_register(CANCTRL, CLKOUT_PRESCALER_);

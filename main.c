@@ -52,7 +52,6 @@
   Identifier_t RxIdentifier_t;
   Identifier_t TxIdentifier_t;
 
-  volatile uint8_t test_u8 = 0;
 
   ISR( TIMER1_OVF_vect ) //ca. 260ms
   {
@@ -138,7 +137,7 @@ int main (void)
 {	  
 	/* Insert system clock initialization code here (sysclk_init()). */
 	uint8_t OldAliveCounter_u8 = 255;
-  _delay_ms(1000);
+  //_delay_ms(1000);
   InitTimer();
   InitISR();   // Timer and IO Interrupt
   GetUnitId(); // 0 - 31
@@ -146,7 +145,7 @@ int main (void)
   InitI0I();   // depends on via DIP configured function
 	_delay_ms(100);
   
-	can_init(BITRATE_125_KBPS);
+	can_init(BITRATE_125_KBPS);    //Already done in Bootloader
   
 /* START: Build Identifier for Alive message*/
 
@@ -198,6 +197,7 @@ int main (void)
   	if (OldAliveCounter_u8 != (uint8_t) AliveMsg.data[4]) // send new Alive message because counter has changed
   	{                                                                                         
     	OldAliveCounter_u8 = AliveMsg.data[4];
+      
     	can_send_message(&AliveMsg);  // Send alive Message
   	}
   	
@@ -230,20 +230,28 @@ int main (void)
     	
     	if (( RxIdentifier_t.TargetFct_u8 == CCiConfig_t.FctId ) && ( RxIdentifier_t.TargetId_u8 == CCiConfig_t.UnitId_u8 )) ///check: Message for this unit
     	{
-      	switch (RxIdentifier_t.TargetFct_u8)
-      	{
-        	case PowerUnit:
-        	SetPowerUnitOutputs(&CommandReceiveMsg);  // read output command and set outputs
-        	break;
+        if ( CommandReceiveMsg.data[0] == 0xFF)
+        {
+      //    cli();
+         asm volatile("jmp 0xF800"); // Jumo to Bootloader area         
+        } 
+        else
+        {        
+      	  switch (RxIdentifier_t.TargetFct_u8)
+      	  {
+        	  case PowerUnit:
+        	  SetPowerUnitOutputs(&CommandReceiveMsg);  // read output command and set outputs
+        	  break;
         	
-        	case InterfaceUnit:
-        	SetInterfaceUnitOutputs(&CommandReceiveMsg); // read output command and set outputs
-        	break;
+        	  case InterfaceUnit:
+        	  SetInterfaceUnitOutputs(&CommandReceiveMsg); // read output command and set outputs
+        	  break;
         	
-        	default:
-        	break;
-      	}
-    	}
+        	  default:
+        	  break;
+      	  }
+    	  }    
+      }           
   	} 
 }
 
