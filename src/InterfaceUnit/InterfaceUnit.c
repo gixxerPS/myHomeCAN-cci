@@ -5,6 +5,7 @@
  *  Author: Mark Roters
  */ 
 #include "InterfaceUnit.h"
+#include "InitEcu.h"
 #include "Identifier.h"
 #include <avr/pgmspace.h>
 #include "can.h"
@@ -28,9 +29,41 @@ void SetDigitalOutputIU( DigOut_t* Output_t )
 bool ReadDigitalInputIU( DigIn_t* Input_t )
 {
   bool SendFlag_b = false;
-  
+  bool DebouncedState_b;
+ 
+  /* ---------START: DEBOUNCE AREA-------------*/
+  if ( *Input_t->Pin & (char)(1<<Input_t->Number) ) // input is off
+  {
+     DebouncedState_b = false;          // local flag for further progress
+     Input_t->DebounceState_u8 = false; // reset debounce flag
+  }
+  else // input is on
+  {
+    if ( Input_t->DebounceState_u8 == false ) // positive trigger
+    {
+      Input_t->DebounceState_u8 = true;                   // timer starting flag
+      Input_t->DebounceTimer_u8 = GlobalTimer.t100ms_u8;   // start debounce timer
+      DebouncedState_b = false;                           // local state for further progress
+    }  
+    else  // debounce state is true
+    {
+      if (( Input_t->DebounceTimer_u8 != GlobalTimer.t100ms_u8 ) && (Input_t->State == 0)) // debounce input
+      {
+         DebouncedState_b = true;
+      } 
+      else if (Input_t->State == 1) // input is already debounced
+      {
+         DebouncedState_b = true;   
+      }    
+      else
+      {
+         DebouncedState_b = false;
+      }     
+    }    
+  }
+  /* -------------END: DEBOUNCE AREA -------------------*/
 
-  if ( *Input_t->Pin & (char)(1<<Input_t->Number)) //Input is off
+  if ( DebouncedState_b == false ) // debounced Input is off
   {
     if ( Input_t->State == 1)
     {
@@ -39,7 +72,7 @@ bool ReadDigitalInputIU( DigIn_t* Input_t )
     Input_t->State = 0;      //if Input is High state OFF because of PullUp Resistor
     Input_t->StateTime05s_u8 = 0; //REset after negativ trigger  
   }
-  else // input is ON
+  else // debounced input is ON
   {
     if (Input_t->State == 0)  // positive trigger
     {

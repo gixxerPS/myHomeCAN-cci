@@ -29,7 +29,7 @@ void InitISR(void);
 #define NUMBER_IU_OUTPUTS 12
 #define NUMBER_PU_OUTPUTS  16
 
-#define VERSION_LOW    0x2
+#define VERSION_LOW    0x3
 #define VERSION_MID    0x0
 #define VERSION_HIGH   0x0
 
@@ -85,8 +85,10 @@ typedef struct DigIn{
   uint8_t*  DDReg;
   uint8_t  Number;
   uint8_t  State;
-  uint8_t  StateTime05s_u8;  //0b001 = 0,5s; 0b010 = 1s; 0b011 = 1,5s... 0b111 = 3s
+  uint8_t  StateTime05s_u8;  //0b001 = 0,5s; 0b010 = 1s; 0b011 = 1,5s... 0b111 = 3s, 
   uint8_t  HalfSecCount_u8;
+  uint8_t  DebounceTimer_u8;
+  uint8_t  DebounceState_u8;
 }DigIn_t;
 
 typedef struct
