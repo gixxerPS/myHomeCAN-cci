@@ -47,6 +47,7 @@
   can_t AliveMsg;
   can_t CommandReceiveMsg;
   can_t DigitInputStateMsg;
+  can_t DigitOutputStateMsg;
 
   Identifier_t AliveId_t;
   Identifier_t RxIdentifier_t;
@@ -137,6 +138,8 @@ int main (void)
 {	  
 	/* Insert system clock initialization code here (sysclk_init()). */
 	uint8_t OldAliveCounter_u8 = 255;
+  uint8_t OldSendCyclicInputStateCounter = 255;
+  uint8_t OldSendCyclicOutputStateCounter = 255;
   //_delay_ms(1000);
   InitTimer();
   InitISR();   // Timer and IO Interrupt
@@ -168,22 +171,30 @@ int main (void)
   AliveMsg.data[5] = VERSION_LOW;
   /* END: Content for Identifier */
 
-  /* START: Build identifier for Interface unit */
-  if (CCiConfig_t.FctId == InterfaceUnit)
-  {
-    TxIdentifier_t.Number_u8 = 1;  // Interface message is message number 1
-    TxIdentifier_t.SrcFct_u8 = CCiConfig_t.FctId; //as configured via DIP
-    TxIdentifier_t.SrcId_u8 = CCiConfig_t.UnitId_u8;  //as configured via DIP
-    TxIdentifier_t.TargetFct_u8 = Master;  // Master
-    TxIdentifier_t.TargetId_u8 = 0;   // there´s only one master :-)
-    TxIdentifier_t.Prio_u8 = 0;       // for future use
+  /* START: Build identifier for Interface unit and Power unit */
+
+  TxIdentifier_t.SrcFct_u8 = CCiConfig_t.FctId; //as configured via DIP
+  TxIdentifier_t.SrcId_u8 = CCiConfig_t.UnitId_u8;  //as configured via DIP
+  TxIdentifier_t.TargetFct_u8 = Master;  // Master
+  TxIdentifier_t.TargetId_u8 = 0;   // there´s only one master :-)
+  TxIdentifier_t.Prio_u8 = 0;      // for future use
     
+  if (CCiConfig_t.FctId == InterfaceUnit)
+  {     
+    // message for input states
+    TxIdentifier_t.Number_u8 = 1;  // Interface message, message number 1
     DigitInputStateMsg.id = BuildIdentifier( TxIdentifier_t); // Build identifier
   }
+  // message for ouput states
+  TxIdentifier_t.Number_u8 = 2;  // Interface message, message number 2 
+  DigitOutputStateMsg.id = BuildIdentifier( TxIdentifier_t); // Build identifier
+
+  /* END: Build identifier for interface unit and power unit */
+
+  DigitOutputStateMsg.flags.rtr = 0;
+  DigitOutputStateMsg.flags.extended = 1; //extendet ID
+  DigitOutputStateMsg.length = 8;         //DLC
   
-
-  /* END: Build identifier for interface unit */
-
   DigitInputStateMsg.flags.rtr = 0;
   DigitInputStateMsg.flags.extended = 1; //extendet ID
   DigitInputStateMsg.length = 8;         //DLC
@@ -197,7 +208,6 @@ int main (void)
   	if (OldAliveCounter_u8 != (uint8_t) AliveMsg.data[4]) // send new Alive message because counter has changed
   	{                                                                                         
     	OldAliveCounter_u8 = AliveMsg.data[4];
-      
     	can_send_message(&AliveMsg);  // Send alive Message
   	}
   	
@@ -208,7 +218,27 @@ int main (void)
     	{
       	SendDigitalInputStates(&DigitInputStateMsg);    	
     	}
+      else if ( OldSendCyclicInputStateCounter != GlobalTimer.t1000ms_u8 )   // send input states cyclic
+      {
+        OldSendCyclicInputStateCounter = GlobalTimer.t1000ms_u8;   
+        SendDigitalInputStates(&DigitInputStateMsg); 
+      }  
+      
+      if ( OldSendCyclicOutputStateCounter != GlobalTimer.t1000ms_u8 ) // send output states cyclic
+      {
+        OldSendCyclicOutputStateCounter = GlobalTimer.t1000ms_u8;
+        SendDigitalOutputStatesIU(&DigitOutputStateMsg);        
+      }              
   	}
+    
+    if ( CCiConfig_t.FctId == PowerUnit)
+    {
+      if ( OldSendCyclicOutputStateCounter != GlobalTimer.t1000ms_u8 ) // send output states cyclic
+      {
+        OldSendCyclicOutputStateCounter = GlobalTimer.t1000ms_u8;
+        SendDigitalOutputStatesPU(&DigitOutputStateMsg);
+      }          
+    }      
 
     /*--------------------TEST MODE-----------------------------*/
     if ( CCiConfig_t.UnitId_u8 == TEST_MODE)  // UnitId only checked once at startup

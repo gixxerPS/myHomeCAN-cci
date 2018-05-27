@@ -16,6 +16,7 @@
 uint8_t QuarterSecondCounter_u8;
 
 void SetInterfaceUnitOutputs(can_t *msg);
+void SendDigitalOutputStatesIU(can_t *msg);
 void SendDigitalInputStates(can_t *msg);
 bool GetAllDigitalInputStates( void );
 #endif /* INTERFACEUNIT_H_ */

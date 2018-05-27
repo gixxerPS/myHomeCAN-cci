@@ -29,7 +29,7 @@ void InitISR(void);
 #define NUMBER_IU_OUTPUTS 12
 #define NUMBER_PU_OUTPUTS  16
 
-#define VERSION_LOW    0x3
+#define VERSION_LOW    0x4
 #define VERSION_MID    0x0
 #define VERSION_HIGH   0x0
 
@@ -73,6 +73,7 @@ typedef enum {	DI_01 = 1,
 typedef struct DigOut{
 	DigOutNr Output;
 	uint8_t*  Port;
+  uint8_t*  Pin;
 	uint8_t*  DDReg;
 	uint8_t  Number;
 	uint8_t  State;

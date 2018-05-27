@@ -14,4 +14,5 @@
 #include "can.h"
 
 void SetPowerUnitOutputs(can_t *msg);
+void SendDigitalOutputStatesPU(can_t *msg);
 #endif /* POWERUNIT_H_ */

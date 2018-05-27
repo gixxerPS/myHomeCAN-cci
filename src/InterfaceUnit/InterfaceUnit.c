@@ -149,6 +149,30 @@ void SetInterfaceUnitOutputs(can_t *msg)
   SetDigitalOutputIU( &DigOutArray_t[11] ); // Output A12
 }
 
+void SendDigitalOutputStatesIU(can_t *msg)
+{
+  for ( int i = 5; i<=7; i++) // clear data bytes
+  {
+    msg->data[i] = 0;
+  }
+    
+  (*DigOutArray_t[0].Pin & (1<<DigOutArray_t[0].Number)) ? ( msg->data[7] |= 0b10000000 ): (0);// Set Bit for A1 if ouptut state is high
+  (*DigOutArray_t[1].Pin & (1<<DigOutArray_t[1].Number)) ? ( msg->data[7] |= 0b01000000 ): (0);// Set Bit for A2 if ouptut state is high
+  (*DigOutArray_t[2].Pin & (1<<DigOutArray_t[2].Number)) ? ( msg->data[7] |= 0b00100000 ): (0);// Set Bit for A3 if ouptut state is high
+  (*DigOutArray_t[3].Pin & (1<<DigOutArray_t[3].Number)) ? ( msg->data[7] |= 0b00010000 ): (0);// Set Bit for A4 if ouptut state is high
+  (*DigOutArray_t[4].Pin & (1<<DigOutArray_t[4].Number)) ? ( msg->data[7] |= 0b00001000 ): (0);// Set Bit for A5 if ouptut state is high
+  (*DigOutArray_t[5].Pin & (1<<DigOutArray_t[5].Number)) ? ( msg->data[7] |= 0b00000100 ): (0);// Set Bit for A6 if ouptut state is high
+  (*DigOutArray_t[6].Pin & (1<<DigOutArray_t[6].Number)) ? ( msg->data[7] |= 0b00000010 ): (0);// Set Bit for A7 if ouptut state is high
+  (*DigOutArray_t[7].Pin & (1<<DigOutArray_t[7].Number)) ? ( msg->data[7] |= 0b00000001 ): (0);// Set Bit for A8 if ouptut state is high
+  (*DigOutArray_t[8].Pin & (1<<DigOutArray_t[8].Number)) ? ( msg->data[6] |= 0b10000000 ): (0);// Set Bit for A9 if ouptut state is high
+  (*DigOutArray_t[9].Pin & (1<<DigOutArray_t[9].Number)) ? ( msg->data[6] |= 0b01000000 ): (0);// Set Bit for A10 if ouptut state is high
+  (*DigOutArray_t[10].Pin & (1<<DigOutArray_t[10].Number)) ? ( msg->data[6] |= 0b00100000 ): (0);// Set Bit for A11 if ouptut state is high
+  (*DigOutArray_t[11].Pin & (1<<DigOutArray_t[11].Number)) ? ( msg->data[6] |= 0b00010000 ): (0);// Set Bit for A12 if ouptut state is high
+  
+  msg->data[6] &= 0b11110000;
+  can_send_message(msg);
+}
+
 void SendDigitalInputStates( can_t *msg)
 {
   for ( int i = 0; i<7; i++) // clear data bytes
