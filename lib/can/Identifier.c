@@ -23,7 +23,7 @@
 
 uint32_t BuildIdentifier( Identifier_t Ident_t)
 {
-	static uint32_t Identifier_u32 = 0;
+	uint32_t Identifier_u32 = 0;
 	
 	Identifier_u32 |= (uint32_t)Ident_t.Number_u8 | (uint32_t)((uint32_t)Ident_t.TargetId_u8 << LENGTH_NUMBER);                                         // Target or Destination ID of message and Message Number
 	Identifier_u32 |= (uint32_t)((uint32_t)Ident_t.TargetFct_u8 << (LENGTH_NUMBER + LENGTH_TARGET_ID ));                                                // Target Function

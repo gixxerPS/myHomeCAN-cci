@@ -29,7 +29,7 @@ void InitISR(void);
 #define NUMBER_IU_OUTPUTS 12
 #define NUMBER_PU_OUTPUTS  16
 
-#define VERSION_LOW    0x4
+#define VERSION_LOW    0x5
 #define VERSION_MID    0x0
 #define VERSION_HIGH   0x0
 
