@@ -20,6 +20,7 @@
 void InitI0I(void);
 void InitTimer(void);
 void InitISR(void);
+void InitWD(void);
 
 #define SET_STATUS_LED() (PORTB |= (1<<STATUS_LED))
 #define RESET_STATUS_LED() (PORTB &= ~((char)1<<STATUS_LED))

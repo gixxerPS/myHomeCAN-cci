@@ -5,6 +5,7 @@
  *  Author: Mark Roters
  */ 
 #include <avr/io.h>
+#include <avr/wdt.h>
 #include "InitEcu.h"
 #include "CciConfig.h"
 #include <avr/pgmspace.h>
@@ -313,4 +314,9 @@ void InitISR(void)
 //  GICR = 1<<INT0;					// Enable INT0
 //  MCUCR = 1<<ISC01 | 0<<ISC00;	// Trigger INT0 on falling edge
   sei();                 // Interrupts global aktivieren	
+}
+
+void InitWD(void)
+{
+  WDTCR = (1<<WDE) | (1<<WDP1) | (1<<WDP2); //timeout 1,04s and Watchdog enabled
 }

@@ -37,6 +37,7 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
+#include <avr/wdt.h>
 #include "can.h"
 #include "CciConfig.h"
 #include "Identifier.h"
@@ -142,13 +143,14 @@ int main (void)
   uint8_t OldSendCyclicOutputStateCounter = 255;
   //_delay_ms(1000);
   InitTimer();
+  
   InitISR();   // Timer and IO Interrupt
   GetUnitId(); // 0 - 31
   GetFctId();  // Sensor Unit, Power Unit, Interface Unit
   InitI0I();   // depends on via DIP configured function
-	_delay_ms(100);
-  
-	can_init(BITRATE_125_KBPS);    //Already done in Bootloader
+  _delay_ms(100);
+  can_init(BITRATE_125_KBPS);    //Already done in Bootloader
+  InitWD();    //Init and enable Watchdog
   
 /* START: Build Identifier for Alive message*/
 
@@ -204,6 +206,10 @@ int main (void)
 	for(;;)
 	{ 
     
+	/*RESET Watchdog*/
+	wdt_reset();
+	/*RESET Watchdog*/
+	
     /* ------------------------ALIVE--------------------------------*/
   	if (OldAliveCounter_u8 != (uint8_t) AliveMsg.data[4]) // send new Alive message because counter has changed
   	{                                                                                         
